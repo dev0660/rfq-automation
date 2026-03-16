@@ -10,6 +10,8 @@ from rest_framework.views import APIView
 from .models import QuoteWorksheet
 from .serializers import RFQIntakeSerializer, QuoteWorksheetSerializer
 
+from .services.workflow import create_worksheet_from_rfq_text
+
 
 class RFQIntakeView(APIView):
     """
@@ -28,18 +30,15 @@ class RFQIntakeView(APIView):
         serializer = RFQIntakeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Create the worksheet representing this RFQ request
-        # Initial state is "processing" until downstream parsing/matching runs
-        worksheet = QuoteWorksheet.objects.create(
-            rfq_text=serializer.validated_data["rfq_text"],
-            status="processing",
-            rfq_source="api",  # Track ingestion channel for analytics/debugging
+        # Create a new QuoteWorksheet and kick off the parsing/matching workflow.
+        worksheet = create_worksheet_from_rfq_text(
+            serializer.validated_data["rfq_text"]
         )
 
-        # Return the created resource so the client can track the RFQ lifecycle
-        response_serializer = QuoteWorksheetSerializer(worksheet)
-
-        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            QuoteWorksheetSerializer(worksheet).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class ActiveQuotesView(APIView):
