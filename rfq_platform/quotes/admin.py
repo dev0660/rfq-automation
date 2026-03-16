@@ -10,18 +10,6 @@ class QuoteLineItemInline(admin.TabularInline):
     # Do not show extra empty forms by default when editing a worksheet.
     extra = 0
 
-    # Fields shown for each line item in the worksheet admin view.
-    fields = (
-        "raw_description",
-        "parsed_description",
-        "quantity",
-        "unit",
-        "matched_catalog_item",
-        "match_score",
-        "match_method",
-        "needs_review",
-    )
-
     # Matching results are generated automatically by the system and
     # should not be manually edited in the admin interface.
     readonly_fields = ("match_score", "match_method")
