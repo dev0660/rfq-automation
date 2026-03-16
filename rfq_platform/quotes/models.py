@@ -69,6 +69,8 @@ class QuoteLineItem(models.Model):
     match_score = models.FloatField(null=True, blank=True)
 
     match_method = models.CharField(max_length=50, blank=True)
+    
+    match_reason = models.TextField(blank=True)
 
     needs_review = models.BooleanField(default=False)
 
